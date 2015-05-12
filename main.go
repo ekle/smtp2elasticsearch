@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 )
 
@@ -26,6 +30,11 @@ func main() {
 		}
 		go handle(conn)
 	}
+}
+
+type message struct {
+	header string
+	body   string
 }
 
 func handle(conn net.Conn) {
@@ -77,4 +86,22 @@ func handle(conn net.Conn) {
 	}
 	fmt.Printf("HEADER IS: \n%s\n", string(HEADER))
 	fmt.Printf("DATA IS: \n%s\n", string(DATA))
+	msg := message{}
+	msg.header = string(HEADER)
+	msg.body = string(DATA)
+	jsonbytes, err := json.Marshal(msg)
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		var post bytes.Buffer
+		post.Write(jsonbytes)
+		_, err := httpskipssl.Post("http://localhost:9200/mails/inbox", "application/json", &post)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
 }
+
+var httpskipssl = &http.Client{Transport: &http.Transport{
+	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+}}
