@@ -33,8 +33,8 @@ func main() {
 }
 
 type message struct {
-	header string
-	body   string
+	Header string
+	Body   string
 }
 
 func handle(conn net.Conn) {
@@ -87,8 +87,8 @@ func handle(conn net.Conn) {
 	fmt.Printf("HEADER IS: \n%s\n", string(HEADER))
 	fmt.Printf("DATA IS: \n%s\n", string(DATA))
 	msg := message{}
-	msg.header = string(HEADER)
-	msg.body = string(DATA)
+	msg.Header = string(HEADER)
+	msg.Body = string(DATA)
 	jsonbytes, err := json.Marshal(msg)
 	if err != nil {
 		fmt.Println(err.Error())
